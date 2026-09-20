@@ -1,0 +1,16 @@
+{
+  "config_version": "1.4.0",
+  "config_name": "Defensive Broadside & Grapeshot",
+  "max_hp": 50,
+  "cannon_damage": 15,
+  "cannon_vs_sail_damage": 8,
+  "sail_ram_damage": 15,
+  "board_crit_damage": 25,
+  "board_clash_damage": 10,
+  "grapeshot_repel_damage": 20,
+  "cannon_cooldown_turns": 2,
+  "board_sabotage_turns": 1,
+  "sail_consumes_cannon": true,
+  "unsuppressed_board_penalized": true,
+  "enemy_ai_aggression": 0.65
+}
