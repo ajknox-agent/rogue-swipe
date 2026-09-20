@@ -132,11 +132,13 @@ static func resolve_turn(
 	# Case 5: Sail vs Board
 	elif player_act == Action.SAIL and enemy_act == Action.BOARD:
 		if player_has_cannon or not sail_consumes:
-			# Evade AND fire defensive broadside (consumes 1 cannon if enabled)
 			res.player_damage = 0
 			res.enemy_damage = s_ram_dmg
 			res.player_consumed_defensive_cannon = sail_consumes
-			res.outcome_summary = "💥 Defensive Broadside! You evaded their grapple and blasted their boarding party with a ready cannon! (-%d HP to Enemy, 1 Cannon Reloading)" % s_ram_dmg
+			if sail_consumes:
+				res.outcome_summary = "💥 Defensive Broadside! You evaded their grapple and blasted their boarding party with a ready cannon! (-%d HP to Enemy, 1 Cannon Reloading)" % s_ram_dmg
+			else:
+				res.outcome_summary = "🛡️ Grapple Shutdown! You anticipated their board, outmaneuvered the grapple, and rammed them! (-%d HP to Enemy)" % s_ram_dmg
 			res.advantage = "PLAYER"
 		else:
 			# Disarmed: Evade only, cannot return fire!
@@ -148,11 +150,13 @@ static func resolve_turn(
 
 	elif player_act == Action.BOARD and enemy_act == Action.SAIL:
 		if enemy_has_cannon or not sail_consumes:
-			# Enemy evades and fires defensive broadside into player
 			res.player_damage = s_ram_dmg
 			res.enemy_damage = 0
 			res.enemy_consumed_defensive_cannon = sail_consumes
-			res.outcome_summary = "⚡ Outmaneuvered! Enemy dodged your grapple and raked your deck with a defensive broadside! (-%d HP to You, Enemy spent a Cannon)" % s_ram_dmg
+			if sail_consumes:
+				res.outcome_summary = "⚡ Outmaneuvered! Enemy dodged your grapple and raked your deck with a defensive broadside! (-%d HP to You, Enemy spent a Cannon)" % s_ram_dmg
+			else:
+				res.outcome_summary = "⚡ Shutdown! Enemy anticipated your board, cut hard, and cut down your boarding party! (-%d HP to You)" % s_ram_dmg
 			res.advantage = "ENEMY"
 		else:
 			# Enemy disarmed: Evades only

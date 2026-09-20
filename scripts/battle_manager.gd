@@ -354,16 +354,19 @@ func _update_ui() -> void:
 		btn_starboard.text = "STARBOARD CANNON ►"
 		edge_hint_right.text = "STARBOARD ►\nCANNON"
 
-	# Dynamic Sail / Board hints based on cannon readiness
-	if p_cannons_ready == 0:
+	# Dynamic Sail / Board hints based on config
+	if config.sail_consumes_cannon and p_cannons_ready == 0:
 		btn_sail.text = "▲ SAIL (EVADE - 0 DMG) ▲"
 		edge_hint_top.text = "▲ SWIPE UP: SAIL (EVADE) ▲"
+	else:
+		btn_sail.text = "▲ SAIL (SHUTDOWN) ▲"
+		edge_hint_top.text = "▲ SWIPE UP: SAIL ▲"
+
+	if config.unsuppressed_board_penalized and p_cannons_ready == 0:
 		btn_board.text = "▼ BOARD (⚠️ NO COVER) ▼"
 		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD (⚠️ NO COVER) ▼"
 	else:
-		btn_sail.text = "▲ SAIL (DEFENSIVE SHOT) ▲"
-		edge_hint_top.text = "▲ SWIPE UP: SAIL ▲"
-		btn_board.text = "▼ BOARD (GRAPPLE) ▼"
+		btn_board.text = "▼ BOARD (AMBUSH) ▼"
 		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD ▼"
 
 	_set_buttons_enabled(current_state == State.PLAYER_TURN)
