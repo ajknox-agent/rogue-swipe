@@ -33,22 +33,22 @@ Actions are not mathematically symmetrical; each move has a distinct tactical pr
 
 | Action | Input Gesture | Tactical Profile | vs. Cannon | vs. Sail | vs. Board |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Port Cannon** | ⬅️ Swipe Left | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals full damage (15 HP); takes massive damage (25 HP) + Sabotaged (+1 CD) |
-| **Starboard Cannon** | ➡️ Swipe Right | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals full damage (15 HP); takes massive damage (25 HP) + Sabotaged (+1 CD) |
-| **Sail (Maneuver)** | ⬆️ Swipe Up | Low Risk / Evasive | Takes half damage (8 HP); deals none | No damage dealt or taken | Full damage dealt (15 HP); none taken |
-| **Board (Grapple)** | ⬇️ Swipe Down | High Risk / High Reward | Deals massive damage (25 HP) + Sabotages (+1 CD); takes full damage (15 HP) | Takes full damage (15 HP); deals none | Moderate damage to both (10 HP) |
+| **Port Cannon** | ⬅️ Swipe Left | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) if boarder has guns. If boarder is disarmed: deals 20 HP, takes 0 HP! |
+| **Starboard Cannon** | ➡️ Swipe Right | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) if boarder has guns. If boarder is disarmed: deals 20 HP, takes 0 HP! |
+| **Sail (Maneuver)** | ⬆️ Swipe Up | Low Risk / Evasive | Takes half damage (8 HP); deals none | No damage dealt or taken | If ship has a ready cannon: fires **Defensive Broadside** for 15 HP, takes 0 HP, and consumes 1 cannon! If disarmed: pure evasion (0 HP dealt, 0 HP taken). |
+| **Board (Grapple)** | ⬇️ Swipe Down | High Risk / High Reward | If ship has a ready cannon (Suppressed): deals 25 HP + Sabotages enemy cannons (+1 CD), takes 15 HP. If disarmed (Unsuppressed): takes 20 HP from grapeshot, deals 0 HP! | Takes 15 HP from defender's defensive broadside (if defender has guns); deals 0 HP. | Cutlass clash: 10 HP damage to both ships. |
 
-* **Cannon (Reliable):** Consistent damage dealer. Clashes evenly with broadsides and deals glancing half-damage against sails. When grappled, cannons fire point-blank for full damage, but suffer massive boarding damage and have their guns spiked (+1 turn added to reload cooldowns).
-* **Sail (Low Risk):** Defensive outmaneuvering. Mitigates cannon fire to 50%, completely avoids and punishes boarding via ramming/kiting, and results in a safe neutral stalemate against enemy sails.
-* **Board (High Risk, High Reward):** Devastating high-impact strike against cannons. Takes point-blank cannon fire in the approach, but inflicts much higher critical damage upon storming the enemy deck AND sabotages the opponent's cannons (+1 reload cooldown). Heavily countered by evasive sails.
+* **Cannon (Reliable):** Consistent damage dealer. Clashes evenly with broadsides, deals glancing half-damage against evasive sails, and obliterates unsuppressed boarding attempts (20 vs 0).
+* **Sail (Defensive Broadside):** Evasive maneuvering. Evades grapples and unleashes a defensive cannon broadside (15 HP) against boarding attempts *provided a cannon is off cooldown* (which consumes that cannon). If all cannons are reloading, Sail becomes pure evasion (0 damage dealt).
+* **Board (High Risk Ambush):** High-impact assault. With covering fire (at least 1 cannon ready), storms enemy decks for 25 damage and sabotages opponent's cannons (+1 CD). If attempted while disarmed (both cannons on cooldown), enemy grapeshot completely wipes out the boarding party (20 damage taken, 0 dealt).
 
-### 2.3 Cannon Cooldown Rule
-* **Port Cannon (Left)** and **Starboard Cannon (Right)** each have an independent **3-turn cooldown**.
-* *Example Sequence:*
-  * Turn 1: Fire Port Cannon (Left) ➔ Port Cannon on cooldown.
-  * Turn 2: Fire Starboard Cannon (Right) ➔ Starboard Cannon on cooldown.
-  * Turn 3: Both cannons are reloading! You **must** either **Sail** (Up) or **Board** (Down).
-* This rule prevents cannon-spamming and forces natural tactical rotation.
+### 2.3 Cannon Cooldown & Disarmed Vulnerability
+* **Independent 3-Turn Cooldown:** Port and Starboard broadsides each have a 3-turn reload cycle.
+* **Defensive Cannons:** Sailing against an incoming Board consumes one ready cannon to deliver its 15 HP blast.
+* **The Disarmed Window:** When both broadsides are empty:
+  * You cannot fire defensive broadsides while sailing (evasion only, 0 damage).
+  * You cannot board with covering fire (enemy cannons will shred you with grapeshot for 20 damage).
+  * Firing both cannons leaves your ship genuinely vulnerable and on the defensive until your ordnance reloads!
 
 ---
 

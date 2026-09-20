@@ -78,7 +78,7 @@ func start_new_battle() -> void:
 	game_over_overlay.hide()
 	status_banner.text = "Swipe or Tap an Action!"
 	combat_log.clear()
-	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.2: Board Sabotages Enemy Cannons +1 CD) ★[/color]")
+	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.3: Sail vs Board uses Cannon; Disarmed Board repelled) ★[/color]")
 	_update_ui()
 
 func _start_ship_bobbing() -> void:
@@ -113,12 +113,22 @@ func _execute_round(player_action: CombatResolver.Action) -> void:
 	# Choose Enemy AI Action
 	var enemy_action = _choose_enemy_action()
 	
+	# Check cannon readiness BEFORE moves consume/trigger reload
+	var player_had_cannon = player_ship.has_ready_cannon()
+	var enemy_had_cannon = enemy_ship.has_ready_cannon()
+	
 	# Mark action cooldowns
 	player_ship.use_action(player_action)
 	enemy_ship.use_action(enemy_action)
 	
 	# Resolve combat
-	var result = CombatResolver.resolve_turn(player_action, enemy_action)
+	var result = CombatResolver.resolve_turn(player_action, enemy_action, player_had_cannon, enemy_had_cannon)
+	
+	# Defensive broadside cannon consumption
+	if result.player_consumed_defensive_cannon:
+		player_ship.consume_one_cannon()
+	if result.enemy_consumed_defensive_cannon:
+		enemy_ship.consume_one_cannon()
 	
 	# Apply damage
 	player_ship.take_damage(result.player_damage)
@@ -135,6 +145,15 @@ func _choose_enemy_action() -> CombatResolver.Action:
 		valid_actions.append(CombatResolver.Action.CANNON_STARBOARD)
 	valid_actions.append(CombatResolver.Action.SAIL)
 	valid_actions.append(CombatResolver.Action.BOARD)
+	
+	# If player has burned both cannons, armed enemy prioritizes Cannon to punish them!
+	if not player_ship.has_ready_cannon():
+		var cannon_acts: Array[CombatResolver.Action] = []
+		for a in valid_actions:
+			if CombatResolver.is_cannon(a):
+				cannon_acts.append(a)
+		if not cannon_acts.is_empty() and randf() < 0.65:
+			return cannon_acts.pick_random()
 	
 	return valid_actions.pick_random()
 
@@ -239,8 +258,13 @@ func _set_buttons_enabled(enabled: bool) -> void:
 	edge_hint_bottom.disabled = not can_board
 
 func _update_ui() -> void:
+	var p_cannons_ready = player_ship.get_ready_cannon_count()
+	
 	# Round Header
-	round_info_label.text = "ROUND %d • v1.2 (Sabotage Enabled)" % round_number
+	if p_cannons_ready == 0:
+		round_info_label.text = "ROUND %d • ⚠️ ALL GUNS RELOADING (DISARMED)!" % round_number
+	else:
+		round_info_label.text = "ROUND %d • v1.3 (Defensive Cannons Active)" % round_number
 	
 	# Health Bars
 	player_hp_bar.value = player_ship.hp
@@ -252,6 +276,13 @@ func _update_ui() -> void:
 	# Cooldown Badges
 	player_port_cd_label.text = "Port: " + _cd_str(player_ship.port_cannon_cd)
 	player_starboard_cd_label.text = "Starboard: " + _cd_str(player_ship.starboard_cannon_cd)
+	
+	if p_cannons_ready == 0:
+		player_port_cd_label.modulate = Color(1.0, 0.4, 0.4)
+		player_starboard_cd_label.modulate = Color(1.0, 0.4, 0.4)
+	else:
+		player_port_cd_label.modulate = Color(0.85, 0.85, 0.85)
+		player_starboard_cd_label.modulate = Color(0.85, 0.85, 0.85)
 	
 	enemy_port_cd_label.text = "Port: " + _cd_str(enemy_ship.port_cannon_cd)
 	enemy_starboard_cd_label.text = "Starboard: " + _cd_str(enemy_ship.starboard_cannon_cd)
@@ -270,6 +301,18 @@ func _update_ui() -> void:
 	else:
 		btn_starboard.text = "STARBOARD CANNON ►"
 		edge_hint_right.text = "STARBOARD ►\nCANNON"
+
+	# Dynamic Sail / Board hints based on cannon readiness
+	if p_cannons_ready == 0:
+		btn_sail.text = "▲ SAIL (EVADE - 0 DMG) ▲"
+		edge_hint_top.text = "▲ SWIPE UP: SAIL (EVADE) ▲"
+		btn_board.text = "▼ BOARD (⚠️ NO COVER) ▼"
+		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD (⚠️ NO COVER) ▼"
+	else:
+		btn_sail.text = "▲ SAIL (DEFENSIVE SHOT) ▲"
+		edge_hint_top.text = "▲ SWIPE UP: SAIL ▲"
+		btn_board.text = "▼ BOARD (GRAPPLE) ▼"
+		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD ▼"
 
 	_set_buttons_enabled(current_state == State.PLAYER_TURN)
 

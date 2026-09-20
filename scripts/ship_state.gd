@@ -58,3 +58,24 @@ func is_dead() -> bool:
 func sabotage_cannons(amount: int = 1) -> void:
 	port_cannon_cd = mini(3, port_cannon_cd + amount)
 	starboard_cannon_cd = mini(3, starboard_cannon_cd + amount)
+
+func has_ready_cannon() -> bool:
+	return port_cannon_cd <= 0 or starboard_cannon_cd <= 0
+
+func get_ready_cannon_count() -> int:
+	var count = 0
+	if port_cannon_cd <= 0:
+		count += 1
+	if starboard_cannon_cd <= 0:
+		count += 1
+	return count
+
+func consume_one_cannon() -> CombatResolver.Action:
+	# Puts one ready cannon on cooldown (prefer port, then starboard)
+	if port_cannon_cd <= 0:
+		port_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+		return CombatResolver.Action.CANNON_PORT
+	elif starboard_cannon_cd <= 0:
+		starboard_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+		return CombatResolver.Action.CANNON_STARBOARD
+	return CombatResolver.Action.NONE
