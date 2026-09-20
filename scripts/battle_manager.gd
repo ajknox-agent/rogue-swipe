@@ -60,7 +60,7 @@ func start_new_battle() -> void:
 	btn_restart.hide()
 	status_banner.text = "Swipe or Tap an Action!"
 	combat_log.clear()
-	_log_message("[color=#62b6cb]★ Battle Commenced! Prepare for ship-to-ship combat! ★[/color]")
+	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.1: Cannon vs Board deals 15 dmg) ★[/color]")
 	_update_ui()
 
 func _start_ship_bobbing() -> void:
@@ -191,7 +191,7 @@ func _set_buttons_enabled(enabled: bool) -> void:
 
 func _update_ui() -> void:
 	# Round Header
-	round_info_label.text = "ROUND %d" % round_number
+	round_info_label.text = "ROUND %d • v1.1" % round_number
 	
 	# Health Bars
 	player_hp_bar.value = player_ship.hp
