@@ -5,6 +5,7 @@
 
 # Build output
 web_build/
+*.zip
 
 # OS / Editor files
 .DS_Store

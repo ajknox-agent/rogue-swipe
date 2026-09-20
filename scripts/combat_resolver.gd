@@ -68,17 +68,17 @@ static func resolve_turn(player_act: Action, enemy_act: Action) -> CombatResult:
 		res.outcome_summary = "You sail evasively! Mitigated enemy cannon blast to -%d HP." % CANNON_VS_SAIL_DAMAGE
 		res.advantage = "ENEMY"
 
-	# Case 3: Cannon vs Board (Boarding catches Cannons mid-aim/reload for CRIT)
+	# Case 3: Cannon vs Board (Cannon deals full blast, but Boarder storms aboard for higher crit damage)
 	elif p_cannon and enemy_act == Action.BOARD:
 		res.player_damage = BOARD_CRIT_DAMAGE
-		res.enemy_damage = 0
-		res.outcome_summary = "Ambush! Enemy crew grapples aboard while cannons are manned! (-%d HP)" % BOARD_CRIT_DAMAGE
+		res.enemy_damage = CANNON_DAMAGE
+		res.outcome_summary = "Brutal Exchange! Cannon blasted boarders (-%d HP), but enemy crew stormed your deck (-%d HP)!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
 		res.advantage = "ENEMY"
 
 	elif player_act == Action.BOARD and e_cannon:
-		res.player_damage = 0
+		res.player_damage = CANNON_DAMAGE
 		res.enemy_damage = BOARD_CRIT_DAMAGE
-		res.outcome_summary = "Critical Strike! You boarded while enemy manned their cannons! (-%d HP)" % BOARD_CRIT_DAMAGE
+		res.outcome_summary = "Point-Blank Ambush! You braved cannon fire (-%d HP) to storm their decks for massive -%d HP!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
 		res.advantage = "PLAYER"
 
 	# Case 4: Sail vs Sail

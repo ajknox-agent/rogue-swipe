@@ -33,14 +33,14 @@ Actions are not mathematically symmetrical; each move has a distinct tactical pr
 
 | Action | Input Gesture | Tactical Profile | vs. Cannon | vs. Sail | vs. Board |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Port Cannon** | ⬅️ Swipe Left | Reliable Ranged | Full damage to both | Half damage dealt; none taken | Full damage dealt; none taken |
-| **Starboard Cannon** | ➡️ Swipe Right | Reliable Ranged | Full damage to both | Half damage dealt; none taken | Full damage dealt; none taken |
-| **Sail (Maneuver)** | ⬆️ Swipe Up | Low Risk / Evasive | Takes half damage; deals none | No damage dealt or taken | Full damage dealt (Ramming/Kiting); none taken |
-| **Board (Grapple)** | ⬇️ Swipe Down | High Risk / High Reward | Massive damage dealt; none taken | Takes full damage; deals none | Moderate damage to both |
+| **Port Cannon** | ⬅️ Swipe Left | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals full damage (15 HP); takes massive damage (25 HP) |
+| **Starboard Cannon** | ➡️ Swipe Right | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals full damage (15 HP); takes massive damage (25 HP) |
+| **Sail (Maneuver)** | ⬆️ Swipe Up | Low Risk / Evasive | Takes half damage (8 HP); deals none | No damage dealt or taken | Full damage dealt (15 HP); none taken |
+| **Board (Grapple)** | ⬇️ Swipe Down | High Risk / High Reward | Deals massive damage (25 HP); takes full damage (15 HP) | Takes full damage (15 HP); deals none | Moderate damage to both (10 HP) |
 
-* **Cannon (Reliable):** Consistent damage dealer. Punishes boarding attempts and clashes evenly with enemy broadsides, but sails mitigate half the blast.
+* **Cannon (Reliable):** Consistent damage dealer. Clashes evenly with broadsides and deals glancing half-damage against sails. When grappled, cannons still fire point-blank for full damage, but suffer massive boarding damage.
 * **Sail (Low Risk):** Defensive outmaneuvering. Mitigates cannon fire to 50%, completely avoids and punishes boarding via ramming/kiting, and results in a safe neutral stalemate against enemy sails.
-* **Board (High Risk, High Reward):** Catches cannon crews mid-reload for devastating critical damage, but is easily countered and wrecked by an evasive sailing maneuver.
+* **Board (High Risk, High Reward):** Devastating high-impact strike against cannons. Takes point-blank cannon fire in the approach, but inflicts much higher critical damage upon storming the enemy deck. Heavily countered by evasive sails.
 
 ### 2.3 Cannon Cooldown Rule
 * **Port Cannon (Left)** and **Starboard Cannon (Right)** each have an independent **3-turn cooldown**.
