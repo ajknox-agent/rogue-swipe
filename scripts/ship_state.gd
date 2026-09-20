@@ -2,22 +2,35 @@ extends RefCounted
 
 const CombatResolver = preload("res://scripts/combat_resolver.gd")
 
-const MAX_HP: int = 50
-const CANNON_COOLDOWN_TURNS: int = 2 # 2 turns cooldown after use (meaning it takes 3 turns total to re-use)
+const MAX_DEFAULT_HP: int = 50
+const DEFAULT_CANNON_COOLDOWN: int = 2
 
 var name: String = "Ship"
-var hp: int = MAX_HP
+var max_hp: int = MAX_DEFAULT_HP
+var hp: int = MAX_DEFAULT_HP
+var cannon_cooldown_turns: int = DEFAULT_CANNON_COOLDOWN
 var port_cannon_cd: int = 0
 var starboard_cannon_cd: int = 0
+var config: RefCounted = null
 
-func _init(p_name: String = "Ship", p_hp: int = MAX_HP) -> void:
+func _init(p_name: String = "Ship", p_config: RefCounted = null) -> void:
 	name = p_name
-	hp = p_hp
-	port_cannon_cd = 0
-	starboard_cannon_cd = 0
+	if p_config:
+		apply_config(p_config)
+	else:
+		hp = max_hp
+
+func apply_config(p_config: RefCounted) -> void:
+	config = p_config
+	if "max_hp" in config:
+		max_hp = config.max_hp
+	if "cannon_cooldown_turns" in config:
+		cannon_cooldown_turns = config.cannon_cooldown_turns
 
 func reset() -> void:
-	hp = MAX_HP
+	if config:
+		apply_config(config)
+	hp = max_hp
 	port_cannon_cd = 0
 	starboard_cannon_cd = 0
 
@@ -37,9 +50,9 @@ func is_action_available(action: CombatResolver.Action) -> bool:
 func use_action(action: CombatResolver.Action) -> void:
 	match action:
 		CombatResolver.Action.CANNON_PORT:
-			port_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+			port_cannon_cd = cannon_cooldown_turns + 1
 		CombatResolver.Action.CANNON_STARBOARD:
-			starboard_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+			starboard_cannon_cd = cannon_cooldown_turns + 1
 
 func tick_cooldowns() -> void:
 	if port_cannon_cd > 0:
@@ -73,9 +86,9 @@ func get_ready_cannon_count() -> int:
 func consume_one_cannon() -> CombatResolver.Action:
 	# Puts one ready cannon on cooldown (prefer port, then starboard)
 	if port_cannon_cd <= 0:
-		port_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+		port_cannon_cd = cannon_cooldown_turns + 1
 		return CombatResolver.Action.CANNON_PORT
 	elif starboard_cannon_cd <= 0:
-		starboard_cannon_cd = CANNON_COOLDOWN_TURNS + 1
+		starboard_cannon_cd = cannon_cooldown_turns + 1
 		return CombatResolver.Action.CANNON_STARBOARD
 	return CombatResolver.Action.NONE

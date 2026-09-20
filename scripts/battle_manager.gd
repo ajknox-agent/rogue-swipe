@@ -3,12 +3,17 @@ extends Control
 const CombatResolver = preload("res://scripts/combat_resolver.gd")
 const ShipState = preload("res://scripts/ship_state.gd")
 const SwipeDetector = preload("res://scripts/swipe_detector.gd")
+const GameConfig = preload("res://scripts/game_config.gd")
 
 # State Machine
 enum State { PLAYER_TURN, RESOLVING, GAME_OVER }
 
 var current_state: State = State.PLAYER_TURN
 var round_number: int = 1
+
+var config: GameConfig = GameConfig.new()
+var http_request: HTTPRequest
+var is_fetching_config: bool = false
 
 var player_ship
 var enemy_ship
@@ -46,8 +51,14 @@ var enemy_ship
 @onready var edge_hint_bottom: Button = %EdgeHintBottom
 
 func _ready() -> void:
-	player_ship = ShipState.new("The Sea Skimmer", 50)
-	enemy_ship = ShipState.new("Scurvy Sloop", 50)
+	# Setup HTTP Request for dynamic config syncing
+	http_request = HTTPRequest.new()
+	add_child(http_request)
+	http_request.timeout = 3.0
+	http_request.request_completed.connect(_on_config_request_completed)
+	
+	player_ship = ShipState.new("The Sea Skimmer", config)
+	enemy_ship = ShipState.new("Scurvy Sloop", config)
 	
 	# Connect signals
 	swipe_detector.action_swiped.connect(_on_action_input)
@@ -68,9 +79,46 @@ func _ready() -> void:
 	)
 	
 	_start_ship_bobbing()
+	fetch_remote_config()
 	start_new_battle()
 
+func fetch_remote_config() -> void:
+	if is_fetching_config or not is_instance_valid(http_request):
+		return
+	is_fetching_config = true
+	var cache_buster = str(Time.get_unix_time_from_system())
+	if OS.has_feature("web"):
+		var url = "config.json?t=" + cache_buster
+		var err = http_request.request(url)
+		if err != OK:
+			is_fetching_config = false
+	else:
+		# When running native or headless, load from local file if available
+		if FileAccess.file_exists("res://config.json"):
+			var f = FileAccess.open("res://config.json", FileAccess.READ)
+			if f:
+				var json_str = f.get_as_text()
+				var parse_res = JSON.parse_string(json_str)
+				if parse_res is Dictionary:
+					config.apply_dict(parse_res)
+					player_ship.apply_config(config)
+					enemy_ship.apply_config(config)
+		is_fetching_config = false
+
+func _on_config_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	is_fetching_config = false
+	if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
+		var json_str = body.get_string_from_utf8()
+		var parse_res = JSON.parse_string(json_str)
+		if parse_res is Dictionary:
+			config.apply_dict(parse_res)
+			player_ship.apply_config(config)
+			enemy_ship.apply_config(config)
+			_log_message("[color=#90e0ef]⚡ Live Config Synced: %s (v%s)[/color]" % [config.config_name, config.config_version])
+			_update_ui()
+
 func start_new_battle() -> void:
+	fetch_remote_config()
 	round_number = 1
 	player_ship.reset()
 	enemy_ship.reset()
@@ -122,7 +170,7 @@ func _execute_round(player_action: CombatResolver.Action) -> void:
 	enemy_ship.use_action(enemy_action)
 	
 	# Resolve combat
-	var result = CombatResolver.resolve_turn(player_action, enemy_action, player_had_cannon, enemy_had_cannon)
+	var result = CombatResolver.resolve_turn(player_action, enemy_action, player_had_cannon, enemy_had_cannon, config)
 	
 	# Defensive broadside cannon consumption
 	if result.player_consumed_defensive_cannon:
@@ -152,7 +200,7 @@ func _choose_enemy_action() -> CombatResolver.Action:
 		for a in valid_actions:
 			if CombatResolver.is_cannon(a):
 				cannon_acts.append(a)
-		if not cannon_acts.is_empty() and randf() < 0.65:
+		if not cannon_acts.is_empty() and randf() < config.enemy_ai_aggression:
 			return cannon_acts.pick_random()
 	
 	return valid_actions.pick_random()
@@ -201,13 +249,13 @@ func _finish_round(p_act: CombatResolver.Action, e_act: CombatResolver.Action, r
 	player_ship.tick_cooldowns()
 	enemy_ship.tick_cooldowns()
 	
-	# Apply Sabotage (+1 to opponent's cannon cooldowns)
+	# Apply Sabotage (+N to opponent's cannon cooldowns)
 	if result.enemy_cannons_sabotaged:
-		enemy_ship.sabotage_cannons(1)
-		_log_message("[color=#ffb703]⚡ Enemy Cannons Sabotaged! (+1 turn added to reload)[/color]")
+		enemy_ship.sabotage_cannons(config.board_sabotage_turns)
+		_log_message("[color=#ffb703]⚡ Enemy Cannons Sabotaged! (+%d turns added to reload)[/color]" % config.board_sabotage_turns)
 	if result.player_cannons_sabotaged:
-		player_ship.sabotage_cannons(1)
-		_log_message("[color=#e63946]⚠️ Your Cannons Were Sabotaged! (+1 turn added to reload)[/color]")
+		player_ship.sabotage_cannons(config.board_sabotage_turns)
+		_log_message("[color=#e63946]⚠️ Your Cannons Were Sabotaged! (+%d turns added to reload)[/color]" % config.board_sabotage_turns)
 	
 	_update_ui()
 	
@@ -220,6 +268,7 @@ func _finish_round(p_act: CombatResolver.Action, e_act: CombatResolver.Action, r
 		_game_over("DEFEAT!", "Your ship has sunk! Arrr!", Color(0.9, 0.3, 0.3))
 	else:
 		round_number += 1
+		fetch_remote_config()
 		current_state = State.PLAYER_TURN
 		_set_buttons_enabled(true)
 		status_banner.text = "Choose your next move!"
@@ -261,17 +310,20 @@ func _update_ui() -> void:
 	var p_cannons_ready = player_ship.get_ready_cannon_count()
 	
 	# Round Header
+	var sync_badge = "⚡" if config.is_live_synced else "⚓"
 	if p_cannons_ready == 0:
-		round_info_label.text = "ROUND %d • ⚠️ ALL GUNS RELOADING (DISARMED)!" % round_number
+		round_info_label.text = "R%d • ⚠️ DISARMED! | %s v%s" % [round_number, sync_badge, config.config_version]
 	else:
-		round_info_label.text = "ROUND %d • v1.3 (Defensive Cannons Active)" % round_number
+		round_info_label.text = "ROUND %d • %s v%s" % [round_number, sync_badge, config.config_version]
 	
 	# Health Bars
+	player_hp_bar.max_value = config.max_hp
 	player_hp_bar.value = player_ship.hp
-	player_hp_label.text = "%d / %d HP" % [player_ship.hp, ShipState.MAX_HP]
+	player_hp_label.text = "%d / %d HP" % [player_ship.hp, config.max_hp]
 	
+	enemy_hp_bar.max_value = config.max_hp
 	enemy_hp_bar.value = enemy_ship.hp
-	enemy_hp_label.text = "%d / %d HP" % [enemy_ship.hp, ShipState.MAX_HP]
+	enemy_hp_label.text = "%d / %d HP" % [enemy_ship.hp, config.max_hp]
 	
 	# Cooldown Badges
 	player_port_cd_label.text = "Port: " + _cd_str(player_ship.port_cannon_cd)
