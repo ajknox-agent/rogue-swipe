@@ -60,7 +60,7 @@ func start_new_battle() -> void:
 	btn_restart.hide()
 	status_banner.text = "Swipe or Tap an Action!"
 	combat_log.clear()
-	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.1: Cannon vs Board deals 15 dmg) ★[/color]")
+	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.2: Board Sabotages Enemy Cannons +1 CD) ★[/color]")
 	_update_ui()
 
 func _start_ship_bobbing() -> void:
@@ -160,6 +160,14 @@ func _finish_round(p_act: CombatResolver.Action, e_act: CombatResolver.Action, r
 	player_ship.tick_cooldowns()
 	enemy_ship.tick_cooldowns()
 	
+	# Apply Sabotage (+1 to opponent's cannon cooldowns)
+	if result.enemy_cannons_sabotaged:
+		enemy_ship.sabotage_cannons(1)
+		_log_message("[color=#ffb703]⚡ Enemy Cannons Sabotaged! (+1 turn added to reload)[/color]")
+	if result.player_cannons_sabotaged:
+		player_ship.sabotage_cannons(1)
+		_log_message("[color=#e63946]⚠️ Your Cannons Were Sabotaged! (+1 turn added to reload)[/color]")
+	
 	_update_ui()
 	
 	# Check Win / Loss
@@ -191,7 +199,7 @@ func _set_buttons_enabled(enabled: bool) -> void:
 
 func _update_ui() -> void:
 	# Round Header
-	round_info_label.text = "ROUND %d • v1.1" % round_number
+	round_info_label.text = "ROUND %d • v1.2 (Sabotage Enabled)" % round_number
 	
 	# Health Bars
 	player_hp_bar.value = player_ship.hp

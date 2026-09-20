@@ -19,6 +19,8 @@ const BOARD_CLASH_DAMAGE: int = 10       # Melee clash when both board
 class CombatResult:
 	var player_damage: int = 0
 	var enemy_damage: int = 0
+	var player_cannons_sabotaged: bool = false
+	var enemy_cannons_sabotaged: bool = false
 	var player_action_name: String = ""
 	var enemy_action_name: String = ""
 	var outcome_summary: String = ""
@@ -68,17 +70,19 @@ static func resolve_turn(player_act: Action, enemy_act: Action) -> CombatResult:
 		res.outcome_summary = "You sail evasively! Mitigated enemy cannon blast to -%d HP." % CANNON_VS_SAIL_DAMAGE
 		res.advantage = "ENEMY"
 
-	# Case 3: Cannon vs Board (Cannon deals full blast, but Boarder storms aboard for higher crit damage)
+	# Case 3: Cannon vs Board (Cannon deals full blast, but Boarder storms aboard for crit damage AND sabotages cannons!)
 	elif p_cannon and enemy_act == Action.BOARD:
 		res.player_damage = BOARD_CRIT_DAMAGE
 		res.enemy_damage = CANNON_DAMAGE
-		res.outcome_summary = "Brutal Exchange! Cannon blasted boarders (-%d HP), but enemy crew stormed your deck (-%d HP)!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
+		res.player_cannons_sabotaged = true
+		res.outcome_summary = "Brutal Clash! Cannon fired (-%d HP), but enemy crew stormed your deck (-%d HP) and SABOTAGED your cannons (+1 Reload)!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
 		res.advantage = "ENEMY"
 
 	elif player_act == Action.BOARD and e_cannon:
 		res.player_damage = CANNON_DAMAGE
 		res.enemy_damage = BOARD_CRIT_DAMAGE
-		res.outcome_summary = "Point-Blank Ambush! You braved cannon fire (-%d HP) to storm their decks for massive -%d HP!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
+		res.enemy_cannons_sabotaged = true
+		res.outcome_summary = "Point-Blank Ambush! You braved cannon fire (-%d HP) to storm their decks for -%d HP and SABOTAGED their cannons (+1 Reload)!" % [CANNON_DAMAGE, BOARD_CRIT_DAMAGE]
 		res.advantage = "PLAYER"
 
 	# Case 4: Sail vs Sail

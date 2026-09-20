@@ -54,3 +54,7 @@ func take_damage(amount: int) -> int:
 
 func is_dead() -> bool:
 	return hp <= 0
+
+func sabotage_cannons(amount: int = 1) -> void:
+	port_cannon_cd = mini(3, port_cannon_cd + amount)
+	starboard_cannon_cd = mini(3, starboard_cannon_cd + amount)
