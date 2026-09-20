@@ -36,6 +36,14 @@ var enemy_ship
 @onready var enemy_ship_visual: Control = %EnemyShipVisual
 @onready var status_banner: Label = %StatusBanner
 @onready var btn_restart: Button = %BtnRestart
+@onready var game_over_overlay: Control = %GameOverOverlay
+@onready var game_over_title: Label = %GameOverTitle
+@onready var game_over_subtitle: Label = %GameOverSubtitle
+
+@onready var edge_hint_top: Button = %EdgeHintTop
+@onready var edge_hint_left: Button = %EdgeHintLeft
+@onready var edge_hint_right: Button = %EdgeHintRight
+@onready var edge_hint_bottom: Button = %EdgeHintBottom
 
 func _ready() -> void:
 	player_ship = ShipState.new("The Sea Skimmer", 50)
@@ -47,7 +55,17 @@ func _ready() -> void:
 	btn_port.pressed.connect(func(): _on_action_input(CombatResolver.Action.CANNON_PORT))
 	btn_starboard.pressed.connect(func(): _on_action_input(CombatResolver.Action.CANNON_STARBOARD))
 	btn_board.pressed.connect(func(): _on_action_input(CombatResolver.Action.BOARD))
+	
+	edge_hint_top.pressed.connect(func(): _on_action_input(CombatResolver.Action.SAIL))
+	edge_hint_left.pressed.connect(func(): _on_action_input(CombatResolver.Action.CANNON_PORT))
+	edge_hint_right.pressed.connect(func(): _on_action_input(CombatResolver.Action.CANNON_STARBOARD))
+	edge_hint_bottom.pressed.connect(func(): _on_action_input(CombatResolver.Action.BOARD))
+	
 	btn_restart.pressed.connect(start_new_battle)
+	game_over_overlay.gui_input.connect(func(event: InputEvent):
+		if (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+			start_new_battle()
+	)
 	
 	_start_ship_bobbing()
 	start_new_battle()
@@ -57,7 +75,7 @@ func start_new_battle() -> void:
 	player_ship.reset()
 	enemy_ship.reset()
 	current_state = State.PLAYER_TURN
-	btn_restart.hide()
+	game_over_overlay.hide()
 	status_banner.text = "Swipe or Tap an Action!"
 	combat_log.clear()
 	_log_message("[color=#62b6cb]★ Battle Commenced! (v1.2: Board Sabotages Enemy Cannons +1 CD) ★[/color]")
@@ -74,6 +92,10 @@ func _start_ship_bobbing() -> void:
 	t2.tween_property(enemy_ship_visual, "position:y", enemy_ship_visual.position.y - 6.0, 1.5).set_trans(Tween.TRANS_SINE)
 
 func _on_action_input(action: CombatResolver.Action) -> void:
+	if current_state == State.GAME_OVER:
+		start_new_battle()
+		return
+	
 	if current_state != State.PLAYER_TURN:
 		return
 	
@@ -188,14 +210,33 @@ func _game_over(title: String, subtitle: String, color: Color) -> void:
 	status_banner.text = "%s - %s" % [title, subtitle]
 	status_banner.modulate = color
 	_log_message("[color=%s][b]*** %s ***[/b][/color]" % [color.to_html(), title])
-	btn_restart.show()
+	game_over_title.text = title
+	game_over_title.modulate = color
+	game_over_subtitle.text = subtitle
+	game_over_overlay.show()
 	_set_buttons_enabled(false)
 
+func _unhandled_input(event: InputEvent) -> void:
+	if current_state == State.GAME_OVER:
+		if (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed) or (event is InputEventKey and event.pressed):
+			start_new_battle()
+			get_viewport().set_input_as_handled()
+
 func _set_buttons_enabled(enabled: bool) -> void:
-	btn_sail.disabled = not enabled or not player_ship.is_action_available(CombatResolver.Action.SAIL)
-	btn_port.disabled = not enabled or not player_ship.is_action_available(CombatResolver.Action.CANNON_PORT)
-	btn_starboard.disabled = not enabled or not player_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD)
-	btn_board.disabled = not enabled or not player_ship.is_action_available(CombatResolver.Action.BOARD)
+	var can_sail = enabled and player_ship.is_action_available(CombatResolver.Action.SAIL)
+	var can_port = enabled and player_ship.is_action_available(CombatResolver.Action.CANNON_PORT)
+	var can_starboard = enabled and player_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD)
+	var can_board = enabled and player_ship.is_action_available(CombatResolver.Action.BOARD)
+
+	btn_sail.disabled = not can_sail
+	btn_port.disabled = not can_port
+	btn_starboard.disabled = not can_starboard
+	btn_board.disabled = not can_board
+
+	edge_hint_top.disabled = not can_sail
+	edge_hint_left.disabled = not can_port
+	edge_hint_right.disabled = not can_starboard
+	edge_hint_bottom.disabled = not can_board
 
 func _update_ui() -> void:
 	# Round Header
@@ -215,6 +256,21 @@ func _update_ui() -> void:
 	enemy_port_cd_label.text = "Port: " + _cd_str(enemy_ship.port_cannon_cd)
 	enemy_starboard_cd_label.text = "Starboard: " + _cd_str(enemy_ship.starboard_cannon_cd)
 	
+	# Button Text with Cooldown Indicator
+	if player_ship.port_cannon_cd > 0:
+		btn_port.text = "◄ PORT [%d]" % player_ship.port_cannon_cd
+		edge_hint_left.text = "◄ PORT\n[%d]" % player_ship.port_cannon_cd
+	else:
+		btn_port.text = "◄ PORT CANNON"
+		edge_hint_left.text = "◄ PORT\nCANNON"
+
+	if player_ship.starboard_cannon_cd > 0:
+		btn_starboard.text = "STARBOARD [%d] ►" % player_ship.starboard_cannon_cd
+		edge_hint_right.text = "STARBOARD ►\n[%d]" % player_ship.starboard_cannon_cd
+	else:
+		btn_starboard.text = "STARBOARD CANNON ►"
+		edge_hint_right.text = "STARBOARD ►\nCANNON"
+
 	_set_buttons_enabled(current_state == State.PLAYER_TURN)
 
 func _cd_str(cd: int) -> String:

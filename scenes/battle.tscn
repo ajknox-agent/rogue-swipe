@@ -1,55 +1,98 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8n1s4f5u9q2a"]
+[gd_scene load_steps=12 format=3 uid="uid://c8n1s4f5u9q2a"]
 
 [ext_resource type="Script" path="res://scripts/battle_manager.gd" id="1_battle"]
 [ext_resource type="Script" path="res://scripts/swipe_detector.gd" id="2_swipe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
-bg_color = Color(0.07, 0.18, 0.28, 1)
+bg_color = Color(0.06, 0.14, 0.22, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.12, 0.28, 0.42, 0.9)
+bg_color = Color(0.1, 0.22, 0.35, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.4, 0.6, 0.8)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
-bg_color = Color(0.25, 0.75, 0.45, 1)
+bg_color = Color(0.2, 0.75, 0.4, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
-bg_color = Color(0.15, 0.15, 0.15, 0.8)
+bg_color = Color(0.12, 0.12, 0.15, 0.9)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enemy_ship"]
-bg_color = Color(0.75, 0.25, 0.25, 1)
+bg_color = Color(0.65, 0.2, 0.2, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.9, 0.8, 0.5, 1)
+border_color = Color(0.95, 0.8, 0.4, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_player_ship"]
-bg_color = Color(0.2, 0.55, 0.85, 1)
+bg_color = Color(0.15, 0.45, 0.75, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.95, 0.9, 0.6, 1)
+border_color = Color(0.4, 0.85, 1, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_edge_hint"]
+bg_color = Color(0.08, 0.18, 0.28, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.75, 1, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gameover"]
+bg_color = Color(0.08, 0.15, 0.24, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.8, 0.2, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_restart"]
+bg_color = Color(0.85, 0.65, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.95, 0.6, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -76,14 +119,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
 
 [node name="MainLayout" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="TopPanel" type="PanelContainer" parent="MarginContainer/MainLayout"]
 layout_mode = 2
@@ -92,13 +135,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 [node name="Pad" type="MarginContainer" parent="MarginContainer/MainLayout/TopPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 8
 
 [node name="VBox" type="VBoxContainer" parent="MarginContainer/MainLayout/TopPanel/Pad"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="HBox" type="HBoxContainer" parent="MarginContainer/MainLayout/TopPanel/Pad/VBox"]
 layout_mode = 2
@@ -106,14 +149,14 @@ layout_mode = 2
 [node name="EnemyTitle" type="Label" parent="MarginContainer/MainLayout/TopPanel/Pad/VBox/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
-theme_override_font_sizes/font_size = 18
-text = "🏴‍☠️ Scurvy Sloop (Enemy)"
+theme_override_colors/font_color = Color(1, 0.75, 0.35, 1)
+theme_override_font_sizes/font_size = 17
+text = "[ENEMY] Scurvy Sloop"
 
 [node name="EnemyHPLabel" type="Label" parent="MarginContainer/MainLayout/TopPanel/Pad/VBox/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "50 / 50 HP"
 
 [node name="EnemyHPBar" type="ProgressBar" parent="MarginContainer/MainLayout/TopPanel/Pad/VBox"]
@@ -133,7 +176,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Port: [READY]"
 
@@ -141,13 +184,13 @@ text = "Port: [READY]"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Starboard: [READY]"
 horizontal_alignment = 2
 
 [node name="Arena" type="Control" parent="MarginContainer/MainLayout"]
-custom_minimum_size = Vector2(0, 240)
+custom_minimum_size = Vector2(0, 230)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -157,27 +200,97 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -60.0
-offset_top = 8.0
-offset_right = 60.0
-offset_bottom = 31.0
+offset_left = -150.0
+offset_top = 4.0
+offset_right = 150.0
+offset_bottom = 26.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 0.6)
-theme_override_font_sizes/font_size = 14
-text = "ROUND 1"
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 0.8)
+theme_override_font_sizes/font_size = 13
+text = "ROUND 1 • v1.2"
 horizontal_alignment = 1
 
-[node name="EnemyShipVisual" type="Panel" parent="MarginContainer/MainLayout/Arena"]
+[node name="EdgeHintTop" type="Button" parent="MarginContainer/MainLayout/Arena"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 65)
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -80.0
-offset_top = 35.0
+offset_left = -110.0
+offset_top = 28.0
+offset_right = 110.0
+offset_bottom = 54.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.5, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_edge_hint")
+text = "▲ SWIPE UP: SAIL ▲"
+
+[node name="EdgeHintLeft" type="Button" parent="MarginContainer/MainLayout/Arena"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 0.0
+offset_top = -24.0
 offset_right = 80.0
-offset_bottom = 100.0
+offset_bottom = 24.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_edge_hint")
+text = "◄ PORT\nCANNON"
+
+[node name="EdgeHintRight" type="Button" parent="MarginContainer/MainLayout/Arena"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -24.0
+offset_right = 0.0
+offset_bottom = 24.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_edge_hint")
+text = "STARBOARD ►\nCANNON"
+
+[node name="EdgeHintBottom" type="Button" parent="MarginContainer/MainLayout/Arena"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -32.0
+offset_right = 120.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_edge_hint")
+text = "▼ SWIPE DOWN: BOARD ▼"
+
+[node name="EnemyShipVisual" type="Panel" parent="MarginContainer/MainLayout/Arena"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 64)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -85.0
+offset_top = 60.0
+offset_right = 85.0
+offset_bottom = 124.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_enemy_ship")
 
@@ -189,24 +302,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 15
-text = "⛵ ENEMY SLOOP
-☠️ ☠️ ☠️"
+text = "ENEMY SLOOP\n[ PIRATE CREW ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PlayerShipVisual" type="Panel" parent="MarginContainer/MainLayout/Arena"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 65)
+custom_minimum_size = Vector2(170, 64)
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -80.0
+offset_left = -85.0
 offset_top = -105.0
-offset_right = 80.0
-offset_bottom = -40.0
+offset_right = 85.0
+offset_bottom = -41.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_player_ship")
@@ -219,8 +331,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 15
-text = "⚓ YOUR SHIP
-⛵ ⛵ ⛵"
+text = "YOUR SHIP\n[ SEA SKIMMER ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -239,8 +350,8 @@ offset_bottom = 14.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 17
-text = "Swipe or Tap an Action!"
+theme_override_font_sizes/font_size = 16
+text = "Swipe or Tap an Arrow!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -251,13 +362,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 [node name="Pad" type="MarginContainer" parent="MarginContainer/MainLayout/PlayerPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 8
 
 [node name="VBox" type="VBoxContainer" parent="MarginContainer/MainLayout/PlayerPanel/Pad"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="HBox" type="HBoxContainer" parent="MarginContainer/MainLayout/PlayerPanel/Pad/VBox"]
 layout_mode = 2
@@ -265,14 +376,14 @@ layout_mode = 2
 [node name="PlayerTitle" type="Label" parent="MarginContainer/MainLayout/PlayerPanel/Pad/VBox/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.5, 0.9, 1, 1)
-theme_override_font_sizes/font_size = 18
-text = "⚓ The Sea Skimmer (You)"
+theme_override_colors/font_color = Color(0.45, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "[YOU] The Sea Skimmer"
 
 [node name="PlayerHPLabel" type="Label" parent="MarginContainer/MainLayout/PlayerPanel/Pad/VBox/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "50 / 50 HP"
 
 [node name="PlayerHPBar" type="ProgressBar" parent="MarginContainer/MainLayout/PlayerPanel/Pad/VBox"]
@@ -292,7 +403,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Port: [READY]"
 
@@ -300,7 +411,7 @@ text = "Port: [READY]"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Starboard: [READY]"
 horizontal_alignment = 2
@@ -313,47 +424,38 @@ columns = 2
 
 [node name="BtnPort" type="Button" parent="MarginContainer/MainLayout/ButtonGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 15
-text = "⬅️ Port Cannon"
+theme_override_font_sizes/font_size = 14
+text = "◄ PORT CANNON"
 
 [node name="BtnStarboard" type="Button" parent="MarginContainer/MainLayout/ButtonGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 15
-text = "➡️ Starboard Cannon"
+theme_override_font_sizes/font_size = 14
+text = "STARBOARD CANNON ►"
 
 [node name="BtnSail" type="Button" parent="MarginContainer/MainLayout/ButtonGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 15
-text = "⬆️ Sail (Maneuver)"
+theme_override_font_sizes/font_size = 14
+text = "▲ SAIL (MANEUVER) ▲"
 
 [node name="BtnBoard" type="Button" parent="MarginContainer/MainLayout/ButtonGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 15
-text = "⬇️ Board (Grapple)"
-
-[node name="BtnRestart" type="Button" parent="MarginContainer/MainLayout"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
-theme_override_font_sizes/font_size = 18
-text = "🔄 Play Again"
+theme_override_font_sizes/font_size = 14
+text = "▼ BOARD (GRAPPLE) ▼"
 
 [node name="CombatLogPanel" type="PanelContainer" parent="MarginContainer/MainLayout"]
-custom_minimum_size = Vector2(0, 140)
+custom_minimum_size = Vector2(0, 130)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
@@ -381,3 +483,81 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("2_swipe")
+
+[node name="GameOverOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dimmer" type="ColorRect" parent="GameOverOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.05, 0.1, 0.75)
+
+[node name="PopupPanel" type="PanelContainer" parent="GameOverOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = -120.0
+offset_right = 175.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gameover")
+
+[node name="Pad" type="MarginContainer" parent="GameOverOverlay/PopupPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="GameOverOverlay/PopupPanel/Pad"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="GameOverTitle" type="Label" parent="GameOverOverlay/PopupPanel/Pad/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "VICTORY!"
+horizontal_alignment = 1
+
+[node name="GameOverSubtitle" type="Label" parent="GameOverOverlay/PopupPanel/Pad/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "Enemy vessel sent to the depths!"
+horizontal_alignment = 1
+
+[node name="BtnRestart" type="Button" parent="GameOverOverlay/PopupPanel/Pad/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.1, 0.15, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_restart")
+text = "↺ PLAY AGAIN"
+
+[node name="TapHint" type="Label" parent="GameOverOverlay/PopupPanel/Pad/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.7)
+theme_override_font_sizes/font_size = 12
+text = "(Or tap anywhere to restart)"
+horizontal_alignment = 1
