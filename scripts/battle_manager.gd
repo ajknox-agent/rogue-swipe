@@ -191,17 +191,14 @@ func _choose_enemy_action() -> CombatResolver.Action:
 		valid_actions.append(CombatResolver.Action.CANNON_PORT)
 	if enemy_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD):
 		valid_actions.append(CombatResolver.Action.CANNON_STARBOARD)
-	valid_actions.append(CombatResolver.Action.SAIL)
-	valid_actions.append(CombatResolver.Action.BOARD)
+	if enemy_ship.is_action_available(CombatResolver.Action.SAIL):
+		valid_actions.append(CombatResolver.Action.SAIL)
+	if enemy_ship.is_action_available(CombatResolver.Action.BOARD):
+		valid_actions.append(CombatResolver.Action.BOARD)
 	
-	# If player has burned both cannons, armed enemy prioritizes Cannon to punish them!
-	if not player_ship.has_ready_cannon():
-		var cannon_acts: Array[CombatResolver.Action] = []
-		for a in valid_actions:
-			if CombatResolver.is_cannon(a):
-				cannon_acts.append(a)
-		if not cannon_acts.is_empty() and randf() < config.enemy_ai_aggression:
-			return cannon_acts.pick_random()
+	# If Port Super Shot is ready, smart chance to fire it!
+	if enemy_ship.is_action_available(CombatResolver.Action.CANNON_PORT) and randf() < 0.45:
+		return CombatResolver.Action.CANNON_PORT
 	
 	return valid_actions.pick_random()
 
@@ -252,10 +249,10 @@ func _finish_round(p_act: CombatResolver.Action, e_act: CombatResolver.Action, r
 	# Apply Sabotage (+N to opponent's cannon cooldowns)
 	if result.enemy_cannons_sabotaged:
 		enemy_ship.sabotage_cannons(config.board_sabotage_turns)
-		_log_message("[color=#ffb703]⚡ Enemy Cannons Sabotaged! (+%d turns added to reload)[/color]" % config.board_sabotage_turns)
+		_log_message("[color=#ffb703]⚡ Enemy Cannons Sabotaged! (+%d turn reload)[/color]" % config.board_sabotage_turns)
 	if result.player_cannons_sabotaged:
 		player_ship.sabotage_cannons(config.board_sabotage_turns)
-		_log_message("[color=#e63946]⚠️ Your Cannons Were Sabotaged! (+%d turns added to reload)[/color]" % config.board_sabotage_turns)
+		_log_message("[color=#e63946]⚠️ Your Cannons Were Sabotaged! (+%d turn reload)[/color]" % config.board_sabotage_turns)
 	
 	_update_ui()
 	
@@ -307,14 +304,9 @@ func _set_buttons_enabled(enabled: bool) -> void:
 	edge_hint_bottom.disabled = not can_board
 
 func _update_ui() -> void:
-	var p_cannons_ready = player_ship.get_ready_cannon_count()
-	
 	# Round Header
 	var sync_badge = "⚡" if config.is_live_synced else "⚓"
-	if p_cannons_ready == 0:
-		round_info_label.text = "R%d • ⚠️ DISARMED! | %s v%s" % [round_number, sync_badge, config.config_version]
-	else:
-		round_info_label.text = "ROUND %d • %s v%s" % [round_number, sync_badge, config.config_version]
+	round_info_label.text = "ROUND %d • %s v%s" % [round_number, sync_badge, config.config_version]
 	
 	# Health Bars
 	player_hp_bar.max_value = config.max_hp
@@ -326,47 +318,41 @@ func _update_ui() -> void:
 	enemy_hp_label.text = "%d / %d HP" % [enemy_ship.hp, config.max_hp]
 	
 	# Cooldown Badges
-	player_port_cd_label.text = "Port: " + _cd_str(player_ship.port_cannon_cd)
-	player_starboard_cd_label.text = "Starboard: " + _cd_str(player_ship.starboard_cannon_cd)
-	
-	if p_cannons_ready == 0:
-		player_port_cd_label.modulate = Color(1.0, 0.4, 0.4)
-		player_starboard_cd_label.modulate = Color(1.0, 0.4, 0.4)
+	player_port_cd_label.text = "Port (Super): " + _cd_str(player_ship.port_cannon_cd)
+	if player_ship.starboard_cannon_cd > 0:
+		player_starboard_cd_label.text = "Starboard: [RELOAD: %d]" % player_ship.starboard_cannon_cd
 	else:
-		player_port_cd_label.modulate = Color(0.85, 0.85, 0.85)
-		player_starboard_cd_label.modulate = Color(0.85, 0.85, 0.85)
+		player_starboard_cd_label.text = "Starboard: [NO CD]"
 	
-	enemy_port_cd_label.text = "Port: " + _cd_str(enemy_ship.port_cannon_cd)
-	enemy_starboard_cd_label.text = "Starboard: " + _cd_str(enemy_ship.starboard_cannon_cd)
+	enemy_port_cd_label.text = "Port (Super): " + _cd_str(enemy_ship.port_cannon_cd)
+	if enemy_ship.starboard_cannon_cd > 0:
+		enemy_starboard_cd_label.text = "Starboard: [RELOAD: %d]" % enemy_ship.starboard_cannon_cd
+	else:
+		enemy_starboard_cd_label.text = "Starboard: [NO CD]"
 	
 	# Button Text with Cooldown Indicator
 	if player_ship.port_cannon_cd > 0:
-		btn_port.text = "◄ PORT [%d]" % player_ship.port_cannon_cd
-		edge_hint_left.text = "◄ PORT\n[%d]" % player_ship.port_cannon_cd
+		btn_port.text = "◄ PORT SUPER [%d]" % player_ship.port_cannon_cd
+		edge_hint_left.text = "◄ PORT SUPER\n[%d]" % player_ship.port_cannon_cd
 	else:
-		btn_port.text = "◄ PORT CANNON"
-		edge_hint_left.text = "◄ PORT\nCANNON"
+		btn_port.text = "◄ PORT (SUPER SHOT)"
+		edge_hint_left.text = "◄ PORT\n(SUPER SHOT)"
 
 	if player_ship.starboard_cannon_cd > 0:
 		btn_starboard.text = "STARBOARD [%d] ►" % player_ship.starboard_cannon_cd
 		edge_hint_right.text = "STARBOARD ►\n[%d]" % player_ship.starboard_cannon_cd
 	else:
-		btn_starboard.text = "STARBOARD CANNON ►"
-		edge_hint_right.text = "STARBOARD ►\nCANNON"
+		btn_starboard.text = "STARBOARD (RAPID) ►"
+		edge_hint_right.text = "STARBOARD ►\n(RAPID)"
 
-	# Dynamic Sail / Board hints based on config
-	if config.sail_consumes_cannon and p_cannons_ready == 0:
-		btn_sail.text = "▲ SAIL (EVADE - 0 DMG) ▲"
-		edge_hint_top.text = "▲ SWIPE UP: SAIL (EVADE) ▲"
-	else:
-		btn_sail.text = "▲ SAIL (SHUTDOWN) ▲"
-		edge_hint_top.text = "▲ SWIPE UP: SAIL ▲"
+	btn_sail.text = "▲ SAIL (SHUTDOWN) ▲"
+	edge_hint_top.text = "▲ SWIPE UP: SAIL ▲"
 
-	if config.unsuppressed_board_penalized and p_cannons_ready == 0:
-		btn_board.text = "▼ BOARD (⚠️ NO COVER) ▼"
-		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD (⚠️ NO COVER) ▼"
+	if player_ship.board_cd > 0:
+		btn_board.text = "▼ BOARD (RELOAD: %d) ▼" % player_ship.board_cd
+		edge_hint_bottom.text = "▼ BOARD [%d] ▼" % player_ship.board_cd
 	else:
-		btn_board.text = "▼ BOARD (AMBUSH) ▼"
+		btn_board.text = "▼ BOARD (GRAPPLE) ▼"
 		edge_hint_bottom.text = "▼ SWIPE DOWN: BOARD ▼"
 
 	_set_buttons_enabled(current_state == State.PLAYER_TURN)

@@ -66,6 +66,8 @@ static func resolve_turn(
 	var penalize_unsuppressed = config.unsuppressed_board_penalized if config and "unsuppressed_board_penalized" in config else true
 	var sail_consumes = config.sail_consumes_cannon if config and "sail_consumes_cannon" in config else true
 	
+	var port_super_dmg = config.port_super_shot_damage if config and "port_super_shot_damage" in config else 20
+	
 	var p_cannon = is_cannon(player_act)
 	var e_cannon = is_cannon(enemy_act)
 	
@@ -79,14 +81,22 @@ static func resolve_turn(
 	# Case 2: Cannon vs Sail
 	elif p_cannon and enemy_act == Action.SAIL:
 		res.player_damage = 0
-		res.enemy_damage = c_v_s_dmg
-		res.outcome_summary = "Enemy sails evasively! Cannon deals glancing hit for -%d HP." % c_v_s_dmg
+		if player_act == Action.CANNON_PORT:
+			res.enemy_damage = port_super_dmg
+			res.outcome_summary = "💥 SUPER SHOT! Port heavy cannon penetrated enemy sails! (-%d HP to Enemy)" % port_super_dmg
+		else:
+			res.enemy_damage = c_v_s_dmg
+			res.outcome_summary = "Enemy sails evasively! Starboard cannon deals glancing hit for -%d HP." % c_v_s_dmg
 		res.advantage = "PLAYER"
 		
 	elif player_act == Action.SAIL and e_cannon:
-		res.player_damage = c_v_s_dmg
 		res.enemy_damage = 0
-		res.outcome_summary = "You sail evasively! Mitigated enemy cannon blast to -%d HP." % c_v_s_dmg
+		if enemy_act == Action.CANNON_PORT:
+			res.player_damage = port_super_dmg
+			res.outcome_summary = "⚠️ HEAVY PUNISH! Enemy Port Super Shot penetrated your sails! (-%d HP to You)" % port_super_dmg
+		else:
+			res.player_damage = c_v_s_dmg
+			res.outcome_summary = "You sail evasively! Mitigated Starboard cannon blast to -%d HP." % c_v_s_dmg
 		res.advantage = "ENEMY"
 
 	# Case 3: Cannon vs Board

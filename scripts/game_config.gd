@@ -13,21 +13,25 @@ var max_hp: int = 50
 # Damage Values
 var cannon_damage: int = 15
 var cannon_vs_sail_damage: int = 8
+var port_super_shot_damage: int = 20  # Heavy super shot vs Sail (punishes sailing)
 var sail_ram_damage: int = 15
 var board_crit_damage: int = 25
 var board_clash_damage: int = 10
 var grapeshot_repel_damage: int = 20
 
 # Cooldowns & Turn Counters
-var cannon_cooldown_turns: int = 2  # Turns on reload after firing (3 turns total cycle)
-var board_sabotage_turns: int = 1   # Turns added to enemy cannons upon successful board
+var port_cooldown_turns: int = 1       # Port Super Shot has 1 turn CD
+var starboard_cooldown_turns: int = 0  # Starboard standard broadside has NO cooldown
+var board_cooldown_turns: int = 1      # Boarding has 1 turn CD (prevents spam)
+var cannon_cooldown_turns: int = 2     # Legacy fallback
+var board_sabotage_turns: int = 1      # Turns added to enemy cannons upon successful board
 
 # Mechanics Toggles
-var sail_consumes_cannon: bool = true
-var unsuppressed_board_penalized: bool = true
+var sail_consumes_cannon: bool = false
+var unsuppressed_board_penalized: bool = false
 
 # AI Settings
-var enemy_ai_aggression: float = 0.65
+var enemy_ai_aggression: float = 0.55
 
 # Live Sync Status
 var is_live_synced: bool = false
@@ -44,6 +48,8 @@ func apply_dict(data: Dictionary) -> void:
 		cannon_damage = int(data["cannon_damage"])
 	if data.has("cannon_vs_sail_damage"):
 		cannon_vs_sail_damage = int(data["cannon_vs_sail_damage"])
+	if data.has("port_super_shot_damage"):
+		port_super_shot_damage = int(data["port_super_shot_damage"])
 	if data.has("sail_ram_damage"):
 		sail_ram_damage = int(data["sail_ram_damage"])
 	if data.has("board_crit_damage"):
@@ -52,6 +58,12 @@ func apply_dict(data: Dictionary) -> void:
 		board_clash_damage = int(data["board_clash_damage"])
 	if data.has("grapeshot_repel_damage"):
 		grapeshot_repel_damage = int(data["grapeshot_repel_damage"])
+	if data.has("port_cooldown_turns"):
+		port_cooldown_turns = int(data["port_cooldown_turns"])
+	if data.has("starboard_cooldown_turns"):
+		starboard_cooldown_turns = int(data["starboard_cooldown_turns"])
+	if data.has("board_cooldown_turns"):
+		board_cooldown_turns = int(data["board_cooldown_turns"])
 	if data.has("cannon_cooldown_turns"):
 		cannon_cooldown_turns = int(data["cannon_cooldown_turns"])
 	if data.has("board_sabotage_turns"):
