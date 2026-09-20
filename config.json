@@ -1,6 +1,6 @@
 {
-  "config_version": "1.4.0",
-  "config_name": "Defensive Broadside & Grapeshot",
+  "config_version": "1.4.1",
+  "config_name": "Live Tuning System Online",
   "max_hp": 50,
   "cannon_damage": 15,
   "cannon_vs_sail_damage": 8,
