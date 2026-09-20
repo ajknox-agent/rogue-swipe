@@ -1,0 +1,11 @@
+# Godot 4+ .gitignore
+.godot/
+*.translation
+*.import
+
+# Build output
+web_build/
+
+# OS / Editor files
+.DS_Store
+*.tmp
