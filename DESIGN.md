@@ -28,19 +28,20 @@ Combat is simultaneous turn-based. Each turn, both the player and enemy ship com
 * **Victory:** Reduce enemy ship HP to 0 (sinks the enemy ship).
 * **Defeat:** Player ship HP reaches 0.
 
-### 2.2 The 3-Pillars Combat Triangle
-Actions are balanced around a distinct tactical loop: Power Move, Turtle Punish, Risky Turnaround, and Hard Shutdown:
+### 2.2 Asymmetric Directional Combat System
+Actions feature directional differentiation, asymmetric cannons, and distinct cooldown profiles:
 
-| Action | Input Gesture | Tactical Profile | vs. Cannon | vs. Sail | vs. Board |
+| Action | Input Gesture | Tactical Profile & Cooldown | vs. Cannon | vs. Sail | vs. Board |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Port Cannon** | ⬅️ Swipe Left | Primary Firepower (3t CD) | Full damage to both (15 HP) | Punishes turtles: deals 8 chip damage; takes 0 | Point-blank exchange: deals 15 HP, but takes 25 HP + Sabotaged (+1 CD) |
-| **Starboard Cannon** | ➡️ Swipe Right | Primary Firepower (3t CD) | Full damage to both (15 HP) | Punishes turtles: deals 8 chip damage; takes 0 | Point-blank exchange: deals 15 HP, but takes 25 HP + Sabotaged (+1 CD) |
-| **Sail (Maneuver)** | ⬆️ Swipe Up | Evasive & Board Shutdown | Takes 8 chip damage; deals 0 | Neutral stalemate (0 HP) | **Total Shutdown:** cleanly evades grapple and rams for 15 HP; takes 0 HP (free of ammo cost)! |
-| **Board (Grapple)** | ⬇️ Swipe Down | High-Risk Turnaround Dive | **Turnaround:** deals 25 HP + Sabotages opponent guns (+1 CD); takes 15 HP | **Hard Countered:** completely shut down by Sail (takes 15 HP, deals 0) | Cutlass clash: 10 HP damage to both ships |
+| **Port Cannon** | ⬅️ Swipe Left | **Heavy Super Shot (1-Turn CD):** Anti-sail punishment | Full damage (15 HP) | **Devastating Anti-Sail Super Shot:** deals 20 HP through sails! | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) |
+| **Starboard Cannon** | ➡️ Swipe Right | **Rapid Broadside (NO COOLDOWN):** Reliable workhorse | Full damage (15 HP) | Glancing hit (8 HP chip) | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) |
+| **Sail (Maneuver)** | ⬆️ Swipe Up | **Evasive & Anti-Grapple (NO CD):** Board shutdown | Mitigates Starboard (8 HP taken). Weak vs Port Super Shot (20 HP taken!) | Neutral stalemate (0 HP) | **Total Shutdown:** cleanly evades grapple and rams for 15 HP; takes 0 HP |
+| **Board (Grapple)** | ⬇️ Swipe Down | **High-Risk Ambush (1-Turn CD):** Comeback dive | **Turnaround:** deals 25 HP + Sabotages opponent guns (+1 CD); takes 15 HP | **Hard Countered:** completely shut down by Sail (takes 15 HP, deals 0) | Cutlass clash: 10 HP damage to both ships |
 
-* **Cannon (The Power Move):** 15 HP workhorse. Great damage, but restricted by a 3-turn reload cycle on each broadside. Punishes players who try to play too safe (deals 8 chip damage to sails).
-* **Sail (The Hard-Read Shutdown):** The anti-grapple shield. When the opponent goes for a desperate or spammy Board, Sail completely shuts it down for 15 damage without consuming ammo.
-* **Board (The High-Risk Turnaround):** The comeback mechanic. When you are low on HP or behind on cooldowns, playing safe will let the enemy chip you down with cannons. Swiping Board is your high-stakes gamble: if the winning player carelessly shoots Cannon, Board deals 25 critical damage and sabotages their guns. But if the winning player reads your desperation and Sails, you are completely shut down!
+* **Port Cannon (⬅️ Left - The Super Shot):** Heavy ordnance with a 1-turn reload cooldown. If the opponent tries to play it safe and Sail, Port Cannon punishes them ruthlessly for **20 damage**!
+* **Starboard Cannon (➡️ Right - The Rapid Broadside):** Always ready! **Zero cooldown**. Deals consistent 15 damage, but is mitigated to 8 chip damage against evasive sails.
+* **Sail (⬆️ Up - The Maneuver):** Cleanly shuts down enemy Boarding for 15 damage and evades Starboard cannons (mitigated to 8). However, it is vulnerable to Port Super Shots!
+* **Board (⬇️ Down - The Grapple):** High-risk comeback tool that inflicts 25 critical damage and sabotages enemy cannons (+1 CD). Now has a **1-turn cooldown**, permanently preventing board-spamming.
 
 ---
 
