@@ -28,27 +28,19 @@ Combat is simultaneous turn-based. Each turn, both the player and enemy ship com
 * **Victory:** Reduce enemy ship HP to 0 (sinks the enemy ship).
 * **Defeat:** Player ship HP reaches 0.
 
-### 2.2 Asymmetric Combat Triangle
-Actions are not mathematically symmetrical; each move has a distinct tactical profile:
+### 2.2 The 3-Pillars Combat Triangle
+Actions are balanced around a distinct tactical loop: Power Move, Turtle Punish, Risky Turnaround, and Hard Shutdown:
 
 | Action | Input Gesture | Tactical Profile | vs. Cannon | vs. Sail | vs. Board |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Port Cannon** | ⬅️ Swipe Left | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) if boarder has guns. If boarder is disarmed: deals 20 HP, takes 0 HP! |
-| **Starboard Cannon** | ➡️ Swipe Right | Reliable Ranged | Full damage to both (15 HP) | Half damage dealt (8 HP); none taken | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) if boarder has guns. If boarder is disarmed: deals 20 HP, takes 0 HP! |
-| **Sail (Maneuver)** | ⬆️ Swipe Up | Low Risk / Evasive | Takes half damage (8 HP); deals none | No damage dealt or taken | If ship has a ready cannon: fires **Defensive Broadside** for 15 HP, takes 0 HP, and consumes 1 cannon! If disarmed: pure evasion (0 HP dealt, 0 HP taken). |
-| **Board (Grapple)** | ⬇️ Swipe Down | High Risk / High Reward | If ship has a ready cannon (Suppressed): deals 25 HP + Sabotages enemy cannons (+1 CD), takes 15 HP. If disarmed (Unsuppressed): takes 20 HP from grapeshot, deals 0 HP! | Takes 15 HP from defender's defensive broadside (if defender has guns); deals 0 HP. | Cutlass clash: 10 HP damage to both ships. |
+| **Port Cannon** | ⬅️ Swipe Left | Primary Firepower (3t CD) | Full damage to both (15 HP) | Punishes turtles: deals 8 chip damage; takes 0 | Point-blank exchange: deals 15 HP, but takes 25 HP + Sabotaged (+1 CD) |
+| **Starboard Cannon** | ➡️ Swipe Right | Primary Firepower (3t CD) | Full damage to both (15 HP) | Punishes turtles: deals 8 chip damage; takes 0 | Point-blank exchange: deals 15 HP, but takes 25 HP + Sabotaged (+1 CD) |
+| **Sail (Maneuver)** | ⬆️ Swipe Up | Evasive & Board Shutdown | Takes 8 chip damage; deals 0 | Neutral stalemate (0 HP) | **Total Shutdown:** cleanly evades grapple and rams for 15 HP; takes 0 HP (free of ammo cost)! |
+| **Board (Grapple)** | ⬇️ Swipe Down | High-Risk Turnaround Dive | **Turnaround:** deals 25 HP + Sabotages opponent guns (+1 CD); takes 15 HP | **Hard Countered:** completely shut down by Sail (takes 15 HP, deals 0) | Cutlass clash: 10 HP damage to both ships |
 
-* **Cannon (Reliable):** Consistent damage dealer. Clashes evenly with broadsides, deals glancing half-damage against evasive sails, and obliterates unsuppressed boarding attempts (20 vs 0).
-* **Sail (Defensive Broadside):** Evasive maneuvering. Evades grapples and unleashes a defensive cannon broadside (15 HP) against boarding attempts *provided a cannon is off cooldown* (which consumes that cannon). If all cannons are reloading, Sail becomes pure evasion (0 damage dealt).
-* **Board (High Risk Ambush):** High-impact assault. With covering fire (at least 1 cannon ready), storms enemy decks for 25 damage and sabotages opponent's cannons (+1 CD). If attempted while disarmed (both cannons on cooldown), enemy grapeshot completely wipes out the boarding party (20 damage taken, 0 dealt).
-
-### 2.3 Cannon Cooldown & Disarmed Vulnerability
-* **Independent 3-Turn Cooldown:** Port and Starboard broadsides each have a 3-turn reload cycle.
-* **Defensive Cannons:** Sailing against an incoming Board consumes one ready cannon to deliver its 15 HP blast.
-* **The Disarmed Window:** When both broadsides are empty:
-  * You cannot fire defensive broadsides while sailing (evasion only, 0 damage).
-  * You cannot board with covering fire (enemy cannons will shred you with grapeshot for 20 damage).
-  * Firing both cannons leaves your ship genuinely vulnerable and on the defensive until your ordnance reloads!
+* **Cannon (The Power Move):** 15 HP workhorse. Great damage, but restricted by a 3-turn reload cycle on each broadside. Punishes players who try to play too safe (deals 8 chip damage to sails).
+* **Sail (The Hard-Read Shutdown):** The anti-grapple shield. When the opponent goes for a desperate or spammy Board, Sail completely shuts it down for 15 damage without consuming ammo.
+* **Board (The High-Risk Turnaround):** The comeback mechanic. When you are low on HP or behind on cooldowns, playing safe will let the enemy chip you down with cannons. Swiping Board is your high-stakes gamble: if the winning player carelessly shoots Cannon, Board deals 25 critical damage and sabotages their guns. But if the winning player reads your desperation and Sails, you are completely shut down!
 
 ---
 
