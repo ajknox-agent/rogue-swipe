@@ -9,7 +9,7 @@ var max_hp: int = MAX_DEFAULT_HP
 var hp: int = MAX_DEFAULT_HP
 var port_cooldown_turns: int = 1
 var starboard_cooldown_turns: int = 0
-var board_cooldown_turns: int = 1
+var board_cooldown_turns: int = 0
 
 var port_cannon_cd: int = 0
 var starboard_cannon_cd: int = 0

@@ -36,12 +36,12 @@ Actions feature directional differentiation, asymmetric cannons, and distinct co
 | **Port Cannon** | ⬅️ Swipe Left | **Heavy Super Shot (1-Turn CD):** Anti-sail punishment | Full damage (15 HP) | **Devastating Anti-Sail Super Shot:** deals 20 HP through sails! | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) |
 | **Starboard Cannon** | ➡️ Swipe Right | **Rapid Broadside (NO COOLDOWN):** Reliable workhorse | Full damage (15 HP) | Glancing hit (8 HP chip) | Deals 15 HP; takes 25 HP + Sabotaged (+1 CD) |
 | **Sail (Maneuver)** | ⬆️ Swipe Up | **Evasive & Anti-Grapple (NO CD):** Board shutdown | Mitigates Starboard (8 HP taken). Weak vs Port Super Shot (20 HP taken!) | Neutral stalemate (0 HP) | **Total Shutdown:** cleanly evades grapple and rams for 15 HP; takes 0 HP |
-| **Board (Grapple)** | ⬇️ Swipe Down | **High-Risk Ambush (1-Turn CD):** Comeback dive | **Turnaround:** deals 25 HP + Sabotages opponent guns (+1 CD); takes 15 HP | **Hard Countered:** completely shut down by Sail (takes 15 HP, deals 0) | Cutlass clash: 10 HP damage to both ships |
+| **Board (Grapple)** | ⬇️ Swipe Down | **High-Risk Ambush (NO COOLDOWN):** Comeback dive | **Turnaround:** deals 25 HP + Sabotages opponent guns (+1 CD); takes 15 HP | **Hard Countered:** completely shut down by Sail (takes 15 HP, deals 0) | Cutlass clash: 10 HP damage to both ships |
 
 * **Port Cannon (⬅️ Left - The Super Shot):** Heavy ordnance with a 1-turn reload cooldown. If the opponent tries to play it safe and Sail, Port Cannon punishes them ruthlessly for **20 damage**!
 * **Starboard Cannon (➡️ Right - The Rapid Broadside):** Always ready! **Zero cooldown**. Deals consistent 15 damage, but is mitigated to 8 chip damage against evasive sails.
 * **Sail (⬆️ Up - The Maneuver):** Cleanly shuts down enemy Boarding for 15 damage and evades Starboard cannons (mitigated to 8). However, it is vulnerable to Port Super Shots!
-* **Board (⬇️ Down - The Grapple):** High-risk comeback tool that inflicts 25 critical damage and sabotages enemy cannons (+1 CD). Now has a **1-turn cooldown**, permanently preventing board-spamming.
+* **Board (⬇️ Down - The Grapple):** High-risk comeback tool that inflicts 25 critical damage and sabotages enemy cannons (+1 CD). **Zero cooldown** — kept in check by the lethal threat of Sail (which deals 15 damage and takes 0).
 
 ---
 

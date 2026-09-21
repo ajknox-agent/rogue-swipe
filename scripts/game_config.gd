@@ -22,7 +22,7 @@ var grapeshot_repel_damage: int = 20
 # Cooldowns & Turn Counters
 var port_cooldown_turns: int = 1       # Port Super Shot has 1 turn CD
 var starboard_cooldown_turns: int = 0  # Starboard standard broadside has NO cooldown
-var board_cooldown_turns: int = 1      # Boarding has 1 turn CD (prevents spam)
+var board_cooldown_turns: int = 0      # Boarding has NO cooldown (countered directly by Sail)
 var cannon_cooldown_turns: int = 2     # Legacy fallback
 var board_sabotage_turns: int = 1      # Turns added to enemy cannons upon successful board
 

@@ -1,6 +1,6 @@
 {
-  "config_version": "1.6.0",
-  "config_name": "Asymmetric Cannons & Board Cooldown",
+  "config_version": "1.7.0",
+  "config_name": "Asymmetric Cannons (No Board CD)",
   "max_hp": 50,
   "cannon_damage": 15,
   "cannon_vs_sail_damage": 8,
@@ -10,7 +10,7 @@
   "board_clash_damage": 10,
   "port_cooldown_turns": 1,
   "starboard_cooldown_turns": 0,
-  "board_cooldown_turns": 1,
+  "board_cooldown_turns": 0,
   "board_sabotage_turns": 1,
   "sail_consumes_cannon": false,
   "unsuppressed_board_penalized": false,
