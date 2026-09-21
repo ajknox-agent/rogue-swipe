@@ -88,7 +88,20 @@ func fetch_remote_config() -> void:
 	is_fetching_config = true
 	var cache_buster = str(Time.get_unix_time_from_system())
 	if OS.has_feature("web"):
-		var url = "config.json?t=" + cache_buster
+		var base_url = ""
+		if ClassDB.class_exists("JavaScriptBridge"):
+			var loc = JavaScriptBridge.eval("window.location.origin + window.location.pathname")
+			if loc != null:
+				base_url = str(loc)
+				if base_url.ends_with(".html"):
+					var slash_idx = base_url.rfind("/")
+					if slash_idx != -1:
+						base_url = base_url.substr(0, slash_idx + 1)
+				elif not base_url.ends_with("/"):
+					base_url += "/"
+		if base_url.is_empty():
+			base_url = "https://ajknox-agent.github.io/rogue-swipe/"
+		var url = base_url + "config.json?t=" + cache_buster
 		var err = http_request.request(url)
 		if err != OK:
 			is_fetching_config = false
