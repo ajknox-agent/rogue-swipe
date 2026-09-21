@@ -17,6 +17,7 @@ var is_fetching_config: bool = false
 
 var player_ship
 var enemy_ship
+var player_action_history: Array[CombatResolver.Action] = []
 
 # Node references (connected in scene)
 @onready var swipe_detector = $SwipeDetector
@@ -133,6 +134,7 @@ func _on_config_request_completed(result: int, response_code: int, _headers: Pac
 func start_new_battle() -> void:
 	fetch_remote_config()
 	round_number = 1
+	player_action_history.clear()
 	player_ship.reset()
 	enemy_ship.reset()
 	current_state = State.PLAYER_TURN
@@ -173,6 +175,7 @@ func _execute_round(player_action: CombatResolver.Action) -> void:
 	
 	# Choose Enemy AI Action
 	var enemy_action = _choose_enemy_action()
+	player_action_history.append(player_action)
 	
 	# Check cannon readiness BEFORE moves consume/trigger reload
 	var player_had_cannon = player_ship.has_ready_cannon()
@@ -199,21 +202,111 @@ func _execute_round(player_action: CombatResolver.Action) -> void:
 	_animate_combat(player_action, enemy_action, result)
 
 func _choose_enemy_action() -> CombatResolver.Action:
-	var valid_actions: Array[CombatResolver.Action] = []
-	if enemy_ship.is_action_available(CombatResolver.Action.CANNON_PORT):
-		valid_actions.append(CombatResolver.Action.CANNON_PORT)
-	if enemy_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD):
-		valid_actions.append(CombatResolver.Action.CANNON_STARBOARD)
-	if enemy_ship.is_action_available(CombatResolver.Action.SAIL):
-		valid_actions.append(CombatResolver.Action.SAIL)
-	if enemy_ship.is_action_available(CombatResolver.Action.BOARD):
-		valid_actions.append(CombatResolver.Action.BOARD)
+	var e_port = enemy_ship.is_action_available(CombatResolver.Action.CANNON_PORT)
+	var p_port = player_ship.is_action_available(CombatResolver.Action.CANNON_PORT)
 	
-	# If Port Super Shot is ready, smart chance to fire it!
-	if enemy_ship.is_action_available(CombatResolver.Action.CANNON_PORT) and randf() < 0.45:
-		return CombatResolver.Action.CANNON_PORT
+	# 1. Base Game-Theoretic Nash Equilibrium
+	# Actions: 0: CANNON_PORT, 1: CANNON_STARBOARD, 2: SAIL, 3: BOARD
+	var weights: Array[float] = [0.0, 0.0, 0.0, 0.0]
+	if e_port:
+		if p_port:
+			weights = [0.333, 0.0, 0.242, 0.425]
+		else:
+			weights = [0.333, 0.0, 0.313, 0.354]
+	else:
+		if p_port:
+			weights = [0.0, 0.442, 0.252, 0.306]
+		else:
+			weights = [0.0, 0.455, 0.303, 0.242]
 	
-	return valid_actions.pick_random()
+	# 2. Adaptive Exploitation (Empirical Best Response against player tendencies)
+	if player_action_history.size() >= 2:
+		var window_size = mini(6, player_action_history.size())
+		var recent_actions = player_action_history.slice(player_action_history.size() - window_size)
+		
+		var p_port_freq: float = 0.0
+		var p_starboard_freq: float = 0.0
+		var p_sail_freq: float = 0.0
+		var p_board_freq: float = 0.0
+		for act in recent_actions:
+			match act:
+				CombatResolver.Action.CANNON_PORT: p_port_freq += 1.0
+				CombatResolver.Action.CANNON_STARBOARD: p_starboard_freq += 1.0
+				CombatResolver.Action.SAIL: p_sail_freq += 1.0
+				CombatResolver.Action.BOARD: p_board_freq += 1.0
+		p_port_freq /= window_size
+		p_starboard_freq /= window_size
+		p_sail_freq /= window_size
+		p_board_freq /= window_size
+		var p_cannon_freq = p_port_freq + p_starboard_freq
+		
+		# Expected value calculations based on actual damage payoffs
+		var ev_port = 0.0 * p_cannon_freq + float(config.port_super_shot_damage) * p_sail_freq - float(config.board_crit_damage - config.cannon_damage) * p_board_freq
+		var ev_starboard = 0.0 * p_cannon_freq + float(config.cannon_vs_sail_damage) * p_sail_freq - float(config.board_crit_damage - config.cannon_damage) * p_board_freq
+		var ev_sail = (-float(config.port_super_shot_damage) * p_port_freq - float(config.cannon_vs_sail_damage) * p_starboard_freq) + float(config.sail_ram_damage) * p_board_freq
+		var ev_board = float(config.board_crit_damage - config.cannon_damage) * p_cannon_freq - float(config.sail_ram_damage) * p_sail_freq
+		
+		var best_action = -1
+		var best_ev = -9999.0
+		if e_port and ev_port > best_ev:
+			best_ev = ev_port
+			best_action = 0
+		if enemy_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD) and ev_starboard > best_ev:
+			best_ev = ev_starboard
+			best_action = 1
+		if enemy_ship.is_action_available(CombatResolver.Action.SAIL) and ev_sail > best_ev:
+			best_ev = ev_sail
+			best_action = 2
+		if enemy_ship.is_action_available(CombatResolver.Action.BOARD) and ev_board > best_ev:
+			best_ev = ev_board
+			best_action = 3
+			
+		var agg = clampf(config.enemy_ai_aggression, 0.0, 1.0)
+		for i in range(4):
+			weights[i] = weights[i] * (1.0 - agg * 0.7)
+		if best_action != -1:
+			weights[best_action] += agg * 0.7
+			
+	# 3. Lethal & Endgame Awareness
+	if player_ship.hp <= config.cannon_vs_sail_damage:
+		# Guaranteed kill or chip with cannons
+		if e_port:
+			weights[0] += 0.4
+		else:
+			weights[1] += 0.4
+	elif player_ship.hp <= config.sail_ram_damage:
+		# If player has boarded recently and is at lethal HP, Sail completely finishes them
+		if player_action_history.size() > 0 and player_action_history[-1] == CombatResolver.Action.BOARD:
+			weights[2] += 0.5
+			
+	# 4. Zero out unavailable actions
+	if not e_port:
+		weights[0] = 0.0
+	if not enemy_ship.is_action_available(CombatResolver.Action.CANNON_STARBOARD):
+		weights[1] = 0.0
+	if not enemy_ship.is_action_available(CombatResolver.Action.SAIL):
+		weights[2] = 0.0
+	if not enemy_ship.is_action_available(CombatResolver.Action.BOARD):
+		weights[3] = 0.0
+		
+	var total_weight = weights[0] + weights[1] + weights[2] + weights[3]
+	if total_weight <= 0.001:
+		return CombatResolver.Action.CANNON_STARBOARD
+		
+	var r = randf() * total_weight
+	var cumulative = 0.0
+	var actions = [
+		CombatResolver.Action.CANNON_PORT,
+		CombatResolver.Action.CANNON_STARBOARD,
+		CombatResolver.Action.SAIL,
+		CombatResolver.Action.BOARD
+	]
+	for i in range(4):
+		cumulative += weights[i]
+		if r <= cumulative:
+			return actions[i]
+			
+	return CombatResolver.Action.CANNON_STARBOARD
 
 func _animate_combat(p_act: CombatResolver.Action, e_act: CombatResolver.Action, result: CombatResolver.CombatResult) -> void:
 	var tween = create_tween().set_parallel(false)
