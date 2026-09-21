@@ -43,6 +43,25 @@ Actions feature directional differentiation, asymmetric cannons, and distinct co
 * **Sail (⬆️ Up - The Maneuver):** Cleanly shuts down enemy Boarding for 15 damage and evades Starboard cannons (mitigated to 8). However, it is vulnerable to Port Super Shots!
 * **Board (⬇️ Down - The Grapple):** High-risk comeback tool that inflicts 25 critical damage and sabotages enemy cannons (+1 CD). **Zero cooldown** — kept in check by the lethal threat of Sail (which deals 15 damage and takes 0).
 
+### 2.3 Game-Theoretic Optimal AI Engine
+The AI opponent does not rely on naive RNG. It computes game-theoretically optimal decisions through a 3-layer decision architecture:
+
+1. **State-Dependent Nash Equilibrium Baseline:**
+   * **Both Port Ready:** Port (33.3%), Board (42.5%), Sail (24.2%), Starboard (0%).
+   * **AI Port Advantaged:** Port (33.3%), Board (35.4%), Sail (31.3%), Starboard (0%).
+   * **AI Port Cooling (Starboard only):** Starboard (44.2%), Board (30.6%), Sail (25.2%).
+   * **Both Port Cooling:** Starboard (45.5%), Sail (30.3%), Board (24.2%).
+2. **Adaptive Exploitation (Fictitious Play & Pattern Detection):**
+   * Dynamically tracks the player's recent action frequency $\hat{q} = (q_{\text{Cannon}}, q_{\text{Sail}}, q_{\text{Board}})$.
+   * Computes the mathematical Expected Value ($EV$) of each available AI move against the player's empirical habits:
+     * If the player over-relies on Boarding $\to$ AI shifts probability to **Sail** (inflicting 15 free damage).
+     * If the player over-relies on Sailing $\to$ AI shifts probability to **Port Super Shot** (inflicting 20 heavy damage).
+     * If the player over-relies on Cannons $\to$ AI shifts probability to **Board** (inflicting 25 crit + Sabotage).
+   * Blends the unexploitable Nash baseline with the Best-Response counter according to `config.enemy_ai_aggression` (default 0.55).
+3. **Endgame & Lethal Execution:**
+   * If player HP $\le$ 8: AI favors Starboard/Port to secure guaranteed chip-damage kills through sails.
+   * If player HP $\le$ 15 and has high Boarding tendency: AI executes defensive Sail maneuvers to punish desperation grapples.
+
 ---
 
 ## 3. Input & Control Scheme
